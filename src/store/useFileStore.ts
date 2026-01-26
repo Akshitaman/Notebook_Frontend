@@ -14,6 +14,7 @@ interface FileState {
     files: NoteFile[];
     activeFileId: string | null;
     isOverviewOpen: boolean;
+    isFoldersOpen: boolean;
 
     // Actions
     createFile: () => void;
@@ -21,6 +22,8 @@ interface FileState {
     updateFileContent: (id: string, content: string) => void;
     openOverview: () => void;
     closeOverview: () => void;
+    openFolders: () => void;
+    closeFolders: () => void;
     closeFile: () => void;
 }
 
@@ -30,6 +33,7 @@ export const useFileStore = create<FileState>()(
             files: [],
             activeFileId: null,
             isOverviewOpen: false,
+            isFoldersOpen: false,
 
             createFile: () => {
                 const newFile: NoteFile = {
@@ -49,7 +53,7 @@ export const useFileStore = create<FileState>()(
             },
 
             selectFile: (id) => {
-                set({ activeFileId: id, isOverviewOpen: true });
+                set({ activeFileId: id, isOverviewOpen: true, isFoldersOpen: false });
             },
 
             updateFileContent: (id, content) => {
@@ -62,8 +66,10 @@ export const useFileStore = create<FileState>()(
                 }));
             },
 
-            openOverview: () => set({ isOverviewOpen: true, activeFileId: null }),
+            openOverview: () => set({ isOverviewOpen: true, isFoldersOpen: false, activeFileId: null }),
             closeOverview: () => set({ isOverviewOpen: false }),
+            openFolders: () => set({ isFoldersOpen: true, isOverviewOpen: false, activeFileId: null }),
+            closeFolders: () => set({ isFoldersOpen: false }),
             closeFile: () => set({ activeFileId: null }), // Go back to dashboard
         }),
         {
