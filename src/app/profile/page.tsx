@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import QuickStats from '@/components/profile/QuickStats';
 import CodePulseHeatmap from '@/components/profile/CodePulseHeatmap';
@@ -38,6 +40,12 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#111] text-zinc-100 p-4 md:p-8 lg:px-12 overflow-y-auto">
       <div className="max-w-4xl mx-auto">
+        <div className="mb-4">
+             <Link href="/" className="inline-flex items-center justify-center p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition-all">
+                <ArrowLeft size={24} />
+             </Link>
+        </div>
+
         <ProfileHeader 
           name={profile.name} 
           tagline={profile.tagline} 
