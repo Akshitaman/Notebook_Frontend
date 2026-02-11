@@ -6,7 +6,7 @@ import SmartEditor from '@/components/editor/SmartEditor';
 import { cn } from '@/lib/utils';
 
 const FileEditorView = () => {
-    const { activeFileId, files, closeFile, updateFileContent } = useFileStore();
+    const { activeFileId, files, closeFile, updateFileContent, updateFileTitle } = useFileStore();
     const { isAIOpen, toggleAI } = useAIStore();
     const activeFile = files.find(f => f.id === activeFileId);
 
@@ -23,9 +23,13 @@ const FileEditorView = () => {
                     >
                          <ArrowLeft size={20} />
                      </button>
-                     <h1 className="font-bold text-lg pointer-events-none select-none">
-                        {activeFile.title}
-                     </h1>
+                     <input
+                        type="text"
+                        value={activeFile.title}
+                        onChange={(e) => updateFileTitle(activeFile.id, e.target.value)}
+                        placeholder="Untitled Note"
+                        className="font-bold text-lg bg-transparent border-none focus:outline-none focus:ring-0 text-zinc-100 placeholder-zinc-500 w-full"
+                    />
                  </div>
 
                  <div className="flex items-center gap-2">

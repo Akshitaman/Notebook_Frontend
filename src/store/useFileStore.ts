@@ -20,6 +20,7 @@ interface FileState {
     createFile: () => void;
     selectFile: (id: string) => void;
     updateFileContent: (id: string, content: string) => void;
+    updateFileTitle: (id: string, title: string) => void;
     openOverview: () => void;
     closeOverview: () => void;
     openFolders: () => void;
@@ -61,6 +62,16 @@ export const useFileStore = create<FileState>()(
                     files: state.files.map((file) =>
                         file.id === id
                             ? { ...file, content, updatedAt: new Date().toISOString() }
+                            : file
+                    ),
+                }));
+            },
+
+            updateFileTitle: (id: string, title: string) => {
+                set((state) => ({
+                    files: state.files.map((file) =>
+                        file.id === id
+                            ? { ...file, title, updatedAt: new Date().toISOString() }
                             : file
                     ),
                 }));
