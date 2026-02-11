@@ -1,10 +1,13 @@
 import React from 'react';
 import { useFileStore } from '@/store/useFileStore';
+import { useAIStore } from '@/store/useAIStore';
 import { ArrowLeft, FileText, LayoutTemplate, Share2 } from 'lucide-react';
 import SmartEditor from '@/components/editor/SmartEditor';
+import { cn } from '@/lib/utils';
 
 const FileEditorView = () => {
     const { activeFileId, files, closeFile, updateFileContent } = useFileStore();
+    const { isAIOpen, toggleAI } = useAIStore();
     const activeFile = files.find(f => f.id === activeFileId);
 
     if (!activeFile) return null;
@@ -26,7 +29,15 @@ const FileEditorView = () => {
                  </div>
 
                  <div className="flex items-center gap-2">
-                     <div className="border border-zinc-800 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs font-medium text-zinc-400 hover:text-white cursor-pointer transition-colors">
+                     <div 
+                        onClick={toggleAI}
+                        className={cn(
+                            "border rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs font-medium cursor-pointer transition-all duration-200 select-none",
+                            isAIOpen 
+                                ? "bg-zinc-800 text-zinc-100 border-zinc-700 shadow-sm"
+                                : "border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                        )}
+                     >
                         <FileText size={14} /> 
                         <span className="opacity-50">|</span>
                         <span>Open AI</span>
