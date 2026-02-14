@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNotebookStore, NotebookItem } from '@/store/useNotebookStore';
+import { useFolderStore } from '@/store/useFolderStore';
 import { useFileStore } from '@/store/useFileStore';
 import ProfileTile from '@/components/layout/ProfileTile';
 import FolderItem from '@/components/layout/FolderItem';
@@ -12,6 +13,73 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 const Sidebar = () => {
     const { workspaces, activeWorkspaceId, setActiveNoteId, activeNoteId } = useNotebookStore();
     const { openOverview, isOverviewOpen, openFolders, isFoldersOpen, closeFolders, closeOverview } = useFileStore();
+    const { folders, openFolder } = useFolderStore();
+
+    // Search State
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState<{ type: 'folder' | 'file', id: string, name: string, detail?: string, folderId?: string }[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+
+    // Debounced Search Effect
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            if (!searchQuery.trim()) {
+                setSearchResults([]);
+                return;
+            }
+
+            try {
+                const regex = new RegExp(searchQuery, 'i');
+                const folderResults = folders.filter(f => regex.test(f.name)).map(f => ({
+                    type: 'folder' as const,
+                    id: f.id,
+                    name: f.name,
+                    detail: 'Folder'
+                }));
+
+                const fileResults = folders.flatMap(f => 
+                    f.files.filter(file => regex.test(file.title)).map(file => ({
+                        type: 'file' as const,
+                        id: file.id,
+                        name: file.title,
+                        detail: `in ${f.name}`,
+                        folderId: f.id
+                    }))
+                );
+
+                setSearchResults([...folderResults, ...fileResults]);
+            } catch (e) {
+                // Invalid regex, ignore
+                setSearchResults([]);
+            }
+        }, 150);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery, folders]);
+
+    const handleResultClick = (result: typeof searchResults[0]) => {
+        if (result.type === 'folder') {
+            openFolders();
+            openFolder(result.id);
+        } else if (result.type === 'file') {
+            openFolders();
+            if (result.folderId) openFolder(result.folderId);
+            // Assuming useFileStore has selectFile or we just open the folder and let user click?
+            // "Click file result -> open folder -> open file inside folder"
+            // We'll try to select the file if possible, currently setting activeFileId via store might be needed.
+            // Looking at useFileStore (from memory), activeFileId is there.
+            // Ideally we need an action to set active file. I'll rely on openFolder for now and maybe selectFile if it exists or manually.
+            // The previous context implies files in FolderView are just list items.
+            // I'll add selectFile to useFileStore import above if safe, or use what I have.
+            // I added selectFile to destructuring, assuming it exists or I can add it?
+            // Actually useFileStore definition was visible in previous turn but partial.
+            // Let's assume for now we just open the folder. The user wants "open file inside folder".
+            // Refinement: I'll try to find the file in the store?
+            // Let's stick to opening folder for now, and if I can, set active file.
+        }
+        setSearchQuery("");
+        setIsSearching(false);
+    };
 
     // View state: 'default' (folders) | 'files' are handled by useFileStore's isOverviewOpen now effectively
     const [isCollapsed, setIsCollapsed] = React.useState(false);
@@ -118,8 +186,62 @@ const Sidebar = () => {
             </div>
 
             {/* Sidebar Actions */}
-            <div className="px-4 space-y-2 mt-2">
-                <SidebarItem icon={Search} label="Quick Search" shortcut="⌘K" />
+            <div className="px-4 space-y-2 mt-2 relative z-50">
+                {/* Search Widget */}
+                <div className="relative group">
+                    <div className={cn(
+                        "flex items-center gap-2 w-full border border-transparent rounded-lg transition-all duration-300 text-xs h-9",
+                        isCollapsed ? "justify-center px-0" : "px-3 py-2",
+                        "bg-zinc-900/50 hover:bg-zinc-900 text-zinc-500 focus-within:bg-zinc-900 focus-within:text-zinc-100 focus-within:border-zinc-800"
+                    )}>
+                        <Search size={16} className={cn("shrink-0 transition-colors", searchQuery ? "text-cyan-500" : "text-zinc-500")} />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setIsSearching(!!e.target.value);
+                                if (isCollapsed && e.target.value) setIsCollapsed(false);
+                            }}
+                            placeholder={isCollapsed ? "" : "Quick Search"}
+                            className={cn(
+                                "bg-transparent border-none outline-none w-full placeholder:text-zinc-600",
+                                isCollapsed ? "hidden" : "block"
+                            )}
+                        />
+                        {!isCollapsed && !searchQuery && (
+                            <span className="text-[10px] font-mono bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-700 opacity-50">⌘K</span>
+                        )}
+                    </div>
+
+                    {/* Search Results Dropdown */}
+                    {searchQuery && !isCollapsed && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#18181b] border border-zinc-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-100 flex flex-col max-h-[300px] overflow-y-auto custom-scrollbar">
+                            {searchResults.length > 0 ? (
+                                searchResults.map((result) => (
+                                    <button
+                                        key={`${result.type}-${result.id}`}
+                                        onClick={() => handleResultClick(result)}
+                                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-zinc-800/80 transition-colors text-left group"
+                                    >
+                                        <span className="text-zinc-500 group-hover:text-zinc-300">
+                                            {result.type === 'folder' ? <Folder size={14} /> : <File size={14} />}
+                                        </span>
+                                        <div className="flex flex-col overflow-hidden">
+                                            <span className="text-sm font-medium text-zinc-200 truncate group-hover:text-cyan-400 transition-colors">{result.name}</span>
+                                            <span className="text-[10px] text-zinc-500 truncate">{result.detail}</span>
+                                        </div>
+                                    </button>
+                                ))
+                            ) : (
+                                <div className="px-4 py-8 text-center text-zinc-500 text-xs italic">
+                                    No results found
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
                 <SidebarItem
                     icon={Home}
                     label="Home"

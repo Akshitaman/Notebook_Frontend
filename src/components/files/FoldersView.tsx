@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useFolderStore } from '@/store/useFolderStore';
-import { Search, Grip, Calendar, MoreVertical, FolderPlus, ArrowLeft, Plus } from 'lucide-react';
+import { Grip, Calendar, MoreVertical, FolderPlus, ArrowLeft, Plus } from 'lucide-react';
 import FolderCard from './FolderCard';
 import { motion } from 'framer-motion';
 
@@ -93,9 +93,7 @@ const FoldersView = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button className="p-2 text-zinc-400 hover:text-white transition-colors">
-                        <Search size={20} />
-                    </button>
+
                     <button className="p-2 text-zinc-400 hover:text-white transition-colors">
                         <Grip size={20} />
                     </button>
