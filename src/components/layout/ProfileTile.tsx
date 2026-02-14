@@ -5,22 +5,26 @@ import Link from 'next/link';
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { User, LogOut, Settings, ChevronDown, LayoutDashboard } from 'lucide-react';
 import { useNotebookStore } from '@/store/useNotebookStore';
+import { useUserStore } from '@/store/useUserStore';
 import { cn } from '@/lib/utils';
 
 const ProfileTile = () => {
     const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useNotebookStore();
     const activeWorkspace = workspaces.find(ws => ws.id === activeWorkspaceId);
+    
+    const { name } = useUserStore();
+    const initial = name ? name.charAt(0).toUpperCase() : 'U';
 
     return (
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
                 <button className="flex items-center gap-2.5 w-full p-1.5 hover:bg-zinc-800/80 rounded-lg transition-all duration-200 outline-none text-left border border-transparent hover:border-zinc-700/50 group">
                     <div className="w-7 h-7 rounded-sm bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-[10px] shadow-sm shrink-0">
-                        P
+                        {initial}
                     </div>
                     <div className="flex-1 overflow-hidden transition-all duration-300">
                         <div className="text-xs font-semibold text-zinc-200 truncate whitespace-nowrap leading-tight max-w-[120px]">
-                            Hi, John
+                            Hi, {name}
                         </div>
                     </div>
                     <ChevronDown size={12} className="text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />

@@ -10,29 +10,20 @@ import TopicTree from '@/components/profile/TopicTree';
 import WeakAreas from '@/components/profile/WeakAreas';
 import { mockProfileData, ProfileState } from '@/data/mockProfileData';
 
+import { useUserStore } from '@/store/useUserStore';
+
 export default function ProfilePage() {
+  const { name, tagline, updateProfile } = useUserStore();
   const [profile, setProfile] = useState<ProfileState | null>(null);
 
   useEffect(() => {
-    // Load identity from localStorage but keep fresh mock data for activity
-    const saved = localStorage.getItem("profile_v1");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setProfile({
-        ...mockProfileData,
-        name: parsed.name ?? mockProfileData.name,
-        tagline: parsed.tagline ?? mockProfileData.tagline,
-      });
-    } else {
-      setProfile(mockProfileData);
-    }
+    // Load rest of profile from mock (activity, topics)
+    // Name/Tagline are now managed by useUserStore
+    setProfile(mockProfileData);
   }, []);
 
-  const handleUpdateProfile = (name: string, tagline: string) => {
-    if (!profile) return;
-    const updated = { ...profile, name, tagline };
-    setProfile(updated);
-    localStorage.setItem("profile_v1", JSON.stringify(updated));
+  const handleUpdateProfile = (newName: string, newTagline: string) => {
+    updateProfile({ name: newName, tagline: newTagline });
   };
 
   if (!profile) return <div className="p-8 text-zinc-500">Loading profile...</div>;
@@ -47,8 +38,8 @@ export default function ProfilePage() {
         </div>
 
         <ProfileHeader 
-          name={profile.name} 
-          tagline={profile.tagline} 
+          name={name} 
+          tagline={tagline} 
           onUpdate={handleUpdateProfile} 
         />
         
