@@ -8,6 +8,7 @@ export type NoteFile = {
     content: string;
     createdAt: string;
     updatedAt: string;
+    pinned?: boolean;
 };
 
 interface FileState {
@@ -27,6 +28,7 @@ interface FileState {
     closeFolders: () => void;
     closeFile: () => void;
     deleteFile: (id: string) => void;
+    toggleFilePin: (id: string) => void;
 }
 
 export const useFileStore = create<FileState>()(
@@ -87,6 +89,15 @@ export const useFileStore = create<FileState>()(
                 set((state) => ({
                     files: state.files.filter((f) => f.id !== id),
                     activeFileId: state.activeFileId === id ? null : state.activeFileId
+                }));
+            },
+            toggleFilePin: (id: string) => {
+                set((state) => ({
+                    files: state.files.map((file) =>
+                        file.id === id
+                            ? { ...file, pinned: !file.pinned }
+                            : file
+                    ),
                 }));
             },
         }),

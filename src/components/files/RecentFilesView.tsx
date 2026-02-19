@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import FileCard from './FileCard';
 
 const RecentFilesView = () => {
-    const { files, selectFile, createFile, updateFileTitle, deleteFile } = useFileStore();
+    const { files, selectFile, createFile, updateFileTitle, deleteFile, toggleFilePin } = useFileStore();
     const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(null);
 
     const handleDeleteConfirm = () => {
@@ -52,6 +52,7 @@ const RecentFilesView = () => {
                         onClick={() => selectFile(file.id)}
                         onRename={(newName) => updateFileTitle(file.id, newName)}
                         onDeleteRequest={() => setDeleteTargetId(file.id)}
+                        onPin={() => toggleFilePin(file.id)}
                     />
                 ))}
 
