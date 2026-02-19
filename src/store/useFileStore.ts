@@ -26,6 +26,7 @@ interface FileState {
     openFolders: () => void;
     closeFolders: () => void;
     closeFile: () => void;
+    deleteFile: (id: string) => void;
 }
 
 export const useFileStore = create<FileState>()(
@@ -82,6 +83,12 @@ export const useFileStore = create<FileState>()(
             openFolders: () => set({ isFoldersOpen: true, isOverviewOpen: false, activeFileId: null }),
             closeFolders: () => set({ isFoldersOpen: false }),
             closeFile: () => set({ activeFileId: null }), // Go back to dashboard
+            deleteFile: (id: string) => {
+                set((state) => ({
+                    files: state.files.filter((f) => f.id !== id),
+                    activeFileId: state.activeFileId === id ? null : state.activeFileId
+                }));
+            },
         }),
         {
             name: 'files-storage', // localStorage key
