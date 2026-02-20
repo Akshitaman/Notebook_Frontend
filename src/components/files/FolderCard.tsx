@@ -18,7 +18,20 @@ const FolderCard = ({ name, fileCount, onClick, onRename, onDelete, onDeleteRequ
     const [isEditing, setIsEditing] = React.useState(false);
     const [isDeletingLocal, setIsDeletingLocal] = React.useState(false);
     const [tempName, setTempName] = React.useState(name);
+    const [showMenu, setShowMenu] = React.useState(false); // New State
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const menuRef = React.useRef<HTMLDivElement>(null); // New Ref
+
+    // Close menu on outside click
+    React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setShowMenu(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     // Sync prop state to local for animation
     React.useEffect(() => {
@@ -70,31 +83,53 @@ const FolderCard = ({ name, fileCount, onClick, onRename, onDelete, onDeleteRequ
             onClick={(e) => {
                 // If editing or deleting, don't trigger navigation
                 if (isEditing || isAnimatingDelete) return;
+                // If clicking menu, don't nav
+                if (showMenu) return; 
                 onClick?.();
             }}
             whileHover="hover"
             initial="initial"
             className={`group flex flex-col gap-4 cursor-pointer relative transition-all duration-300 ${isAnimatingDelete ? 'blur-sm opacity-0 scale-95 pointer-events-none' : ''}`}
         >
-            {/* Action Buttons */}
-            <div className="absolute top-2 right-2 flex items-center gap-2 z-50 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                <button 
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setIsEditing(true);
-                    }}
-                    className="p-1.5 rounded-full bg-black/40 text-zinc-400 hover:text-white hover:bg-black/60 transition-all"
-                    title="Rename"
-                >
-                    <Edit2 size={14} />
-                </button>
-                <button 
-                    onClick={handleDeleteClick}
-                    className="p-1.5 rounded-full bg-black/40 text-zinc-400 hover:text-red-400 hover:bg-black/60 transition-all"
-                    title="Delete"
-                >
-                    <Trash2 size={14} />
-                </button>
+            {/* Action Buttons (Triple Dot Menu) */}
+            <div className="absolute top-2 right-2 z-50 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <div className="relative" ref={menuRef}>
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setShowMenu(!showMenu);
+                        }}
+                        className="p-1.5 rounded-full bg-black/40 text-zinc-400 hover:text-white hover:bg-black/60 transition-all"
+                    >
+                        <MoreVertical size={16} />
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {showMenu && (
+                        <div className="absolute right-0 top-full mt-1 w-32 bg-[#18181b] border border-zinc-800 rounded-lg shadow-xl py-1 flex flex-col z-[60] animate-in fade-in zoom-in-95 duration-100">
+                             <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsEditing(true);
+                                    setShowMenu(false);
+                                }}
+                                className="px-3 py-2 text-left text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors flex items-center gap-2"
+                            >
+                                <Edit2 size={12} /> Rename
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDeleteRequest?.();
+                                    setShowMenu(false);
+                                }}
+                                className="px-3 py-2 text-left text-xs text-zinc-400 hover:text-red-400 hover:bg-zinc-800 transition-colors flex items-center gap-2"
+                            >
+                                <Trash2 size={12} /> Delete
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Folder Icon Container */}
