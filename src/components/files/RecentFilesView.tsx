@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFileStore } from '@/store/useFileStore';
-import { Plus, Search, Grip, Calendar, MoreVertical, FileText } from 'lucide-react';
+import { Plus, Grip, Calendar, MoreVertical, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const RecentFilesView = () => {
@@ -15,9 +15,6 @@ const RecentFilesView = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button className="p-2 text-zinc-400 hover:text-white transition-colors">
-                        <Search size={20} />
-                    </button>
                     <button className="p-2 text-zinc-400 hover:text-white transition-colors">
                         <Grip size={20} />
                     </button>

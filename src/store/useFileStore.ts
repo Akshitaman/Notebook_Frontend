@@ -15,6 +15,7 @@ interface FileState {
     activeFileId: string | null;
     isOverviewOpen: boolean;
     isFoldersOpen: boolean;
+    searchQuery: string;
 
     // Actions
     createFile: () => void;
@@ -25,6 +26,7 @@ interface FileState {
     closeOverview: () => void;
     openFolders: () => void;
     closeFolders: () => void;
+    setSearchQuery: (query: string) => void;
     closeFile: () => void;
 }
 
@@ -35,6 +37,7 @@ export const useFileStore = create<FileState>()(
             activeFileId: null,
             isOverviewOpen: false,
             isFoldersOpen: false,
+            searchQuery: '',
 
             createFile: () => {
                 const newFile: NoteFile = {
@@ -77,10 +80,11 @@ export const useFileStore = create<FileState>()(
                 }));
             },
 
-            openOverview: () => set({ isOverviewOpen: true, isFoldersOpen: false, activeFileId: null }),
+            openOverview: () => set({ isOverviewOpen: true, isFoldersOpen: false, activeFileId: null, searchQuery: '' }),
             closeOverview: () => set({ isOverviewOpen: false }),
-            openFolders: () => set({ isFoldersOpen: true, isOverviewOpen: false, activeFileId: null }),
+            openFolders: () => set({ isFoldersOpen: true, isOverviewOpen: false, activeFileId: null, searchQuery: '' }),
             closeFolders: () => set({ isFoldersOpen: false }),
+            setSearchQuery: (query: string) => set({ searchQuery: query }),
             closeFile: () => set({ activeFileId: null }), // Go back to dashboard
         }),
         {

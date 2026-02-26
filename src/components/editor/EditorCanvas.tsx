@@ -8,10 +8,19 @@ import RecentFilesView from '@/components/files/RecentFilesView';
 import FileEditorView from '@/components/files/FileEditorView';
 import HomeView from '@/components/layout/HomeView';
 import FoldersView from '@/components/files/FoldersView';
+import SearchView from '@/components/files/SearchView';
 
 const EditorCanvas = () => {
     const { activeNoteId, updateShadowContent } = useNotebookStore();
-    const { isOverviewOpen, isFoldersOpen, activeFileId } = useFileStore();
+    const { isOverviewOpen, isFoldersOpen, activeFileId, searchQuery } = useFileStore();
+
+    if (searchQuery) {
+        return (
+            <div className="flex flex-col flex-1 h-screen overflow-hidden bg-brand-dark">
+                <SearchView />
+            </div>
+        );
+    }
 
     if (isOverviewOpen) {
         if (activeFileId) {
