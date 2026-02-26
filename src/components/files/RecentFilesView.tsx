@@ -74,9 +74,9 @@ const RecentFilesView = () => {
             {/* FAB */}
             <button
                 onClick={createFile}
-                className="absolute bottom-8 right-8 w-14 h-14 bg-cyan-500 hover:bg-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/20 transition-all hover:scale-110 active:scale-95 z-50"
+                className="absolute bottom-8 right-8 w-16 h-16 bg-[#22d3ee] rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/20 transition-all hover:bg-[#15abbf] hover:scale-105 active:scale-95 z-50 group font-bold"
             >
-                <Plus size={28} className="text-[#0c0c0e]" strokeWidth={3} />
+                <Plus size={28} className="text-white group-hover:scale-110 transition-transform duration-300" strokeWidth={2.5} />
             </button>
         </div>
     );

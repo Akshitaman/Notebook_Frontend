@@ -3,64 +3,102 @@
 import React from 'react';
 import Link from 'next/link';
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { User, LogOut, Settings, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { LogOut, Settings, ChevronDown, HelpCircle, Languages, Moon, Info } from 'lucide-react';
 import { useNotebookStore } from '@/store/useNotebookStore';
 import { useUserStore } from '@/store/useUserStore';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const ProfileTile = () => {
-    const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useNotebookStore();
+const ProfileTile = ({ isCollapsed }: { isCollapsed?: boolean }) => {
+    const { workspaces, activeWorkspaceId } = useNotebookStore();
     const activeWorkspace = workspaces.find(ws => ws.id === activeWorkspaceId);
-    
+
     const { name } = useUserStore();
-    const initial = name ? name.charAt(0).toUpperCase() : 'U';
+
+    const getInitials = (fullName: string) => {
+        const parts = fullName.split(' ').filter(p => p.length > 0);
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+        return (fullName || 'U').slice(0, 1).toUpperCase();
+    };
+
+    const initials = getInitials(name || 'User');
+
+    const MenuItem = ({ icon: Icon, label, onClick }: { icon: any, label: string, onClick?: () => void }) => (
+        <DropdownMenu.Item
+            onClick={onClick}
+            className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-200 hover:bg-white/5 rounded-lg cursor-pointer outline-none transition-colors group"
+        >
+            <Icon size={16} className="text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+            <span className="font-medium">{label}</span>
+        </DropdownMenu.Item>
+    );
 
     return (
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-                <button className="flex items-center gap-2.5 w-full p-1.5 hover:bg-zinc-800/80 rounded-lg transition-all duration-200 outline-none text-left border border-transparent hover:border-zinc-700/50 group">
-                    <div className="w-7 h-7 rounded-sm bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-[10px] shadow-sm shrink-0">
-                        {initial}
-                    </div>
-                    <div className="flex-1 overflow-hidden transition-all duration-300">
-                        <div className="text-xs font-semibold text-zinc-200 truncate whitespace-nowrap leading-tight max-w-[120px]">
-                            Hi, {name}
+                <button className={cn(
+                    "flex flex-row items-center w-full hover:bg-zinc-800/80 rounded-xl transition-all duration-300 outline-none text-left border border-transparent hover:border-white/5 group relative h-14",
+                )}>
+                    <div className="w-[56px] shrink-0 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-full bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-black shadow-lg shadow-cyan-500/10 shrink-0 border-2 border-zinc-900 text-sm">
+                            {initials}
                         </div>
                     </div>
-                    <ChevronDown size={12} className="text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+
+                    {!isCollapsed && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex-1 overflow-hidden flex flex-col justify-center"
+                        >
+                            <div className="text-sm font-bold text-white tracking-tight truncate leading-none mb-1.5">
+                                {name}
+                            </div>
+                            <div className="text-[10px] font-bold text-zinc-500 truncate leading-none uppercase tracking-widest opacity-80">
+                                {activeWorkspace?.name || "Personal"}
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {!isCollapsed && (
+                        <div className="pr-3">
+                            <ChevronDown size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                        </div>
+                    )}
                 </button>
             </DropdownMenu.Trigger>
 
             <DropdownMenu.Portal>
                 <DropdownMenu.Content
-                    side="right"
-                    align="start"
+                    side="top"
+                    align={isCollapsed ? "center" : "start"}
                     sideOffset={12}
-                    className={cn(
-                        "w-64 bg-[#1a1a1a] border border-zinc-800 rounded-lg shadow-2xl p-1.5 z-100 outline-none",
-                        "animate-in fade-in zoom-in-95 slide-in-from-left-2 duration-200"
-                    )}
+                    className="z-100 outline-none"
+                    asChild
                 >
-                    {/* Top Section: Identity */}
-                    <div className="px-2 py-2 mb-1 flex items-center justify-between">
-                        <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-zinc-100">
-                                {activeWorkspace?.name || "Personal"}
-                            </span>
+                    <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="w-56 bg-[#1e1e1e] border border-white/8 rounded-[12px] shadow-2xl p-1.5 focus:outline-none"
+                    >
+                        <div className="space-y-0.5">
+                            <MenuItem icon={HelpCircle} label="FAQ" />
+                            <MenuItem icon={Languages} label="Language" />
+                            <MenuItem icon={Moon} label="Toggle Theme" />
+                            <MenuItem icon={Settings} label="Settings" />
+                            <MenuItem icon={Info} label="Learn More" />
+
+                            <div className="h-px bg-white/8 my-1.5 mx-1" />
+
+                            <MenuItem icon={LogOut} label="Logout" />
                         </div>
-                    </div>
-
-                    <DropdownMenu.Separator className="h-px bg-zinc-800/60 my-1.5 mx-1" />
-
-                    {/* Action Section */}
-                    <DropdownMenu.Item asChild>
-                        <Link href="/profile" className="flex items-center gap-2.5 px-2 py-1.5 text-sm text-zinc-400 hover:bg-zinc-800/80 hover:text-zinc-100 rounded cursor-pointer outline-none transition-colors">
-                            <LayoutDashboard size={14} /> Dashboard
-                        </Link>
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item className="flex items-center gap-2.5 px-2 py-1.5 text-sm text-red-400/80 hover:bg-red-500/10 hover:text-red-400 rounded cursor-pointer outline-none transition-colors">
-                        <LogOut size={14} /> Log out
-                    </DropdownMenu.Item>
+                    </motion.div>
                 </DropdownMenu.Content>
             </DropdownMenu.Portal>
         </DropdownMenu.Root>
