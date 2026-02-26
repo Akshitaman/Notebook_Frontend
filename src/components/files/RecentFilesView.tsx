@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFileStore } from '@/store/useFileStore';
-import { Plus, Search, Grip, Calendar, MoreVertical, FileText } from 'lucide-react';
+import { Plus, Grip, Calendar, MoreVertical, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import FileCard from './FileCard';
 
@@ -25,9 +25,6 @@ const RecentFilesView = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button className="p-2 text-zinc-400 hover:text-white transition-colors">
-                        <Search size={20} />
-                    </button>
                     <button className="p-2 text-zinc-400 hover:text-white transition-colors">
                         <Grip size={20} />
                     </button>
@@ -67,14 +64,14 @@ const RecentFilesView = () => {
             {/* FAB */}
             <button
                 onClick={createFile}
-                className="absolute bottom-8 right-8 w-14 h-14 bg-cyan-500 hover:bg-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/20 transition-all hover:scale-110 active:scale-95 z-50"
+                className="absolute bottom-8 right-8 w-16 h-16 bg-[#22d3ee] rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/20 transition-all hover:bg-[#15abbf] hover:scale-105 active:scale-95 z-50 group font-bold"
             >
-                <Plus size={28} className="text-[#0c0c0e]" strokeWidth={3} />
+                <Plus size={28} className="text-white group-hover:scale-110 transition-transform duration-300" strokeWidth={2.5} />
             </button>
 
             {/* Delete Confirmation Modal */}
             {deleteTargetId && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-[#18181b] border border-zinc-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full animate-in zoom-in-95 duration-200">
                         <h3 className="text-lg font-bold text-zinc-100 mb-2">Delete File?</h3>
                         <p className="text-zinc-400 text-sm mb-6">
