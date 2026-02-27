@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useNotebookStore, NotebookItem } from '@/store/useNotebookStore';
 import { useFolderStore } from '@/store/useFolderStore';
 import { useFileStore } from '@/store/useFileStore';
@@ -19,7 +20,8 @@ import {
     Settings,
     HelpCircle,
     Layout,
-    Pin
+    Pin,
+    LayoutDashboard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -29,6 +31,8 @@ const Sidebar = () => {
     const { workspaces, activeWorkspaceId, setActiveNoteId, activeNoteId } = useNotebookStore();
     const { files, openOverview, isOverviewOpen, openFolders, isFoldersOpen, closeFolders, closeOverview, selectFile, toggleFilePin } = useFileStore();
     const { folders, openFolder, createFolder } = useFolderStore();
+    const router = useRouter();
+    const pathname = usePathname();
 
     // Search State
     const [searchQuery, setSearchQuery] = useState("");
@@ -185,6 +189,10 @@ const Sidebar = () => {
     const handleFoldersClick = () => {
         openFolders();
         setActiveNoteId(null);
+    };
+
+    const handleDashboardClick = () => {
+        router.push('/profile');
     };
 
     return (
@@ -383,6 +391,16 @@ const Sidebar = () => {
                     </div>
                 )}
             </div>
+            {/* Dashboard nav item — above footer */}
+            <div className="px-0 pb-1">
+                <SidebarItem
+                    icon={LayoutDashboard}
+                    label="Dashboard"
+                    onClick={handleDashboardClick}
+                    isActive={pathname === '/profile'}
+                />
+            </div>
+
             {/* Footer: Profile tile */}
             <div className={cn(
                 "border-t border-white/5 bg-[#0c0c0e]/80 backdrop-blur-md transition-all duration-300",
